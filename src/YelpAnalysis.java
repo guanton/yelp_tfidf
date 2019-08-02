@@ -42,7 +42,6 @@ public class YelpAnalysis {
                 //since the format of the file is {, Business info, }, {, Business info, }, ...
                 // we can build a string representing each business by looking inside the brackets
                 if (result == '{') {
-                    System.out.println("beg");
                     continue;
                 }
                 if (result == '}') {
@@ -60,14 +59,12 @@ public class YelpAnalysis {
             System.out.println("couldn't find file");
         } finally {
             try {
-                System.out.println("trynna close");
                 in.close();
             } catch (Exception e) {
                 System.out.println("could't close file");
             }
         }
     }
-
 
     public Business strToBusiness(String sb) {
         List<String> BusFieldStrings = Arrays.asList(sb.split(","));
@@ -103,6 +100,7 @@ public class YelpAnalysis {
         return reviews.length();
     }
 
+    //updates the dictionary with a new batch of reviews
     public void dictionaryhelper(String reviews) {
         //split the reviews into a list of individual words
         List<String> wordsinreviews = Arrays.asList(reviews.split(" "));
@@ -124,6 +122,17 @@ public class YelpAnalysis {
             }
         }
     }
+
+    //extracts an ordered list of the top 10 businesses by review character count
+    public List<Business> filtertop10(Queue<Business> businesses) {
+        List<Business> top10 = new ArrayList<>();
+        for (int x = 0; x < 10; x++) {
+            top10.add(businesses.peek());
+            businesses.remove();
+        }
+        return top10;
+    }
+
 
 
 
