@@ -18,7 +18,7 @@ public class YelpAnalysis {
         yp.txtToString();
     }
 
-    //given a .txt file, this constructs one String corresponding to each Business in the .txt file, and then
+    //given a .txt file, this constructs one String for each Business in the .txt file, and then
     //sends that String as a parameter for strToBusiness to construct a list of Businesses
     public void txtToString() {
         InputStream in = null;
@@ -38,9 +38,10 @@ public class YelpAnalysis {
                 if (result == '}') {
                     //construct a business with sb
                     strToBusiness(sb.toString());
-                    sb.setLength(0);
+                    sb = new StringBuilder();
                     continue;
                 } else {
+                    //we are interested in what is between the brackets
                     sb.append(result);
                 }
                 // if there are no more characters in the file, then result will be -1, and we exit the loop
