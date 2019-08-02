@@ -37,6 +37,10 @@ public class Business {
         return s;
     }
 
+    public void settfidfmap(Map<String, Double> tfidfmap) {
+        this.tfidfmap = tfidfmap;
+    }
+
     public String toString() {
         return "-------------------------------------------------------------------------------\n"
                 + "Business ID: " + businessID + "\n"
@@ -44,7 +48,7 @@ public class Business {
                 + "Business Address: " + businessAddress + "\n"
                 + "Reviews: " + reviews + "\n"
                 + "Character Count: " + reviewCharCount + "\n"
-                + "idf scores: " + "NA"; //update later to: maptostring(tfidfmap)
+                + "idf scores: " + maptostring(tfidfmap);
     }
 
 
