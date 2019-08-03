@@ -35,7 +35,7 @@ public class YelpAnalysis {
         StringBuilder sb = new StringBuilder();
         try {
             //set the input stream to the file containing the dataset
-            in = new FileInputStream("yelpDatasetParsed_short.txt");
+            in = new FileInputStream("yelpDatasetParsed_full.txt");
             in = new BufferedInputStream(in);
             while (true) {
                 int res = in.read();
