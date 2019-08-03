@@ -5,7 +5,7 @@ the tf-idf metric. Since the dataset is quite large, my main method outputs this
 
 
 Simply modify the method "filtertop10()" if you'd like to see the data from a different number of businesses from the dataset.
-Also note that you must modify the comparator "SortByReviewCharCount" to alter the order of the businesses to be outputted.
+Also note that you must modify the comparator "SortByReviewCharCount" to alter the order of the businesses to be outputted. Finally, IDEs such as intelliJ restrict the file size of attached .txt files. My code will run on much larger datasets, but only when operated outside of an IDE setting, ex. using Sublime.
 
 To make this project, I made use of:
 
