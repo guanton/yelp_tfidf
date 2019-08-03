@@ -16,14 +16,15 @@ public class YelpAnalysis {
     private Queue<Business> businesses = new PriorityQueue<>(srcc.reversed());
 
 
-    //testing
+    //this outputs data from the top 10 businesses (most reviewed on Yelp) in the datset
+    //notably, the output data for each business contains the words with the top 30 tf-idf scores
+    //this simulates "tags" that would be applied to businesses
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
         yp.txtToString();
-        System.out.println(yp.dictionary);
         for (Business b: yp.filtertop10()) {
             b.settfidfmap(yp.top30words(b));
-            System.out.println(b.toString());
+            System.out.println(b);
         }
     }
 

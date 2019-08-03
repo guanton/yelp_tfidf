@@ -24,6 +24,7 @@ public class Business {
     }
 
     //converts the map of words with their tfidf scores to a string
+    //use of mod for even spacing
     public String maptostring(Map<String, Double> tfidfmap) {
         String s = "";
         int x = 1;
@@ -46,7 +47,7 @@ public class Business {
                 + "Business ID: " + businessID + "\n"
                 + "Business Name: " + businessName + "\n"
                 + "Business Address: " + businessAddress + "\n"
-                + "Reviews: " + reviews + "\n"
+//                + "Reviews: " + reviews + "\n"
                 + "Character Count: " + reviewCharCount + "\n"
                 + "idf scores: " + maptostring(tfidfmap);
     }
