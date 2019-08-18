@@ -46,7 +46,6 @@ public class Business {
                 + "Business ID: " + businessID + "\n"
                 + "Business Name: " + businessName + "\n"
                 + "Business Address: " + businessAddress + "\n"
-                + "Reviews: " + reviews + "\n"
                 + "Character Count: " + reviewCharCount + "\n"
                 + "Key Words: " + maptostring(tfidfmap);
     }
