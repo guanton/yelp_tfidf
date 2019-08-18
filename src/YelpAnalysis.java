@@ -7,16 +7,17 @@ import java.util.*;
 
 public class YelpAnalysis {
 
-    //map where the keys are every word that appears in any review, and the value is how many documents they appear in
-    //i.e. basically a dictionary of word frequencies
+
+    //a dictionary containing every word that makes an appearance in the reviews contained in the dataset along with
+    //the number of restaurants in the dataset whose reviews contain the word
     private Map<String, Integer> dictionary = new HashMap<>();
-    //we will sort our businesses in order of decreasing review character count
+    //we will sort our businesses in order of decreasing number of characters in their reviews
     SortByReviewCharCount srcc = new SortByReviewCharCount();
-    //priority Queue representing every business in the .txt file
+    //a priority Queue representing every business in the .txt file
     private Queue<Business> businesses = new PriorityQueue<>(srcc.reversed());
 
 
-    //testing
+    //testing: running this systematically prints the data from the top 10 businesses (most characters in reviews)
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
         yp.txtToString();
@@ -28,7 +29,7 @@ public class YelpAnalysis {
     }
 
 
-    //given a .txt file, this constructs one String for each Business in the .txt file, and then
+    //this method ta constructs one String for each Business in the .txt file, and then
     //sends that String as a parameter for strToBusiness to construct a list of Businesses
     public void txtToString() {
         InputStream in = null;
