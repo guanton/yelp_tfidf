@@ -13,8 +13,10 @@ public class YelpAnalysis {
     private Map<String, Integer> dictionary = new HashMap<>();
     //we will sort our businesses in order of decreasing number of characters in their reviews
     SortByReviewCharCount srcc = new SortByReviewCharCount();
+    SortByTfidf stfidf = new SortByTfidf();
     //a priority Queue representing every business in the .txt file
-    private Queue<Business> businesses = new PriorityQueue<>(srcc.reversed());
+    private Queue<Business> businesses = new PriorityQueue<>(stfidf.reversed());
+    private Queue<Business> checkBusinesses = new PriorityQueue<>(srcc);
 
 
     //testing: running this systematically prints the data from the top 10 businesses (most characters in reviews)
@@ -22,19 +24,26 @@ public class YelpAnalysis {
 
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
-        yp.txtToString();
+        yp.txtToString("restaurant");
         for (Business b: yp.filtertop10()) {
-            b.settfidfmap(yp.top30words(b));
-            System.out.println(b.toString());
+            System.out.println(b);
         }
     }
 
+
+    public void checkScore(Business b) {
+        for (Double d: b.tfidfmap.values()) {
+            if (d > 10) {
+                b.settfidfmap(this.top30words(b));
+            }
+        }
+    }
 
 
     //this method constructs one String for each Business in the .txt file (dataset), and then
     //sends each String as a parameter to the method strToBusiness to construct a list of Businesses
 
-    public void txtToString() {
+    public void txtToString(String query) {
         InputStream in = null;
         StringBuilder sb = new StringBuilder();
         try {
@@ -58,7 +67,23 @@ public class YelpAnalysis {
                     continue;
                 }
                 if (result == '}') {
-                    businesses.add(strToBusiness(sb.toString())); //construct a business with sb
+                    Business b = strToBusiness(sb.toString());
+                    b.settfidfmap(this.top30words(b));
+                    b.assigntfidf(query);
+                    businesses.add(b);
+//                    boolean include = false;
+//                    for (Business bu: businesses) {
+//                        if (bu.tfidf <= b.tfidf) {
+//                            include = true;
+//                        }
+//                    }
+//                    if (include){
+//                        businesses.add(b);
+//                    }
+//                     //construct a business with sb
+//                    if (businesses.size() > 10) {
+//                        businesses.remove();
+//                    }
                     sb = new StringBuilder();
                     continue;
                 } else {
@@ -98,6 +123,7 @@ public class YelpAnalysis {
             } else {
                 reviews = BusFieldStrings.get(x).trim();
                 reviewCharCount = charCount(reviews);
+                //updates dictionary
                 this.dictionaryHelper(reviews);
                 b = new Business(businessID, businessName, businessAddress, reviews, reviewCharCount, null);
 //                System.out.println(b);
@@ -135,12 +161,15 @@ public class YelpAnalysis {
         }
     }
 
-    //extracts an ordered list of the top 10 businesses by review character count
+
+
+    //extracts an ordered list of the top 10 businesses related to the query (highest tf-idf)
     public List<Business> filtertop10() {
         List<Business> top10 = new ArrayList<>();
         for (int x = 0; x < 10; x++) {
-            top10.add(businesses.peek()); //recall that businesses is sorted by character count already
+            top10.add(businesses.peek());
             businesses.remove();
+
         }
         return top10;
     }
@@ -164,19 +193,30 @@ public class YelpAnalysis {
             Double tfidf;
             //only assign a non-0 idf score if the word appears in at least 5 documents in the .txt file
             if (dictionary.get(s).intValue()>=5) {
+                boolean inMap = true;
                 tfidf = new Double(wordFrequencies.get(s).doubleValue() / dictionary.get(s).doubleValue());
+                while (inMap) {
+                    if (!map_tfidf.keySet().contains(tfidf)) {
+                        inMap = false;
+                    } else {
+                        tfidf = tfidf + 0.00001;
+                    }
+                }
             } else {
-                tfidf = new Double(0);
+                Random r = new Random();
+                Double rd = r.nextDouble();
+                tfidf = new Double(rd);
             }
             map_tfidf.put(tfidf, s);
         }
+
         //now, store the idf's into a list so that we can sort them in decreasing order
         List<Double> listtfidf = new ArrayList<>(map_tfidf.keySet());
         Collections.sort(listtfidf, Collections.reverseOrder());
         //prepare the map that we will return
         Map<String, Double> finalmap = new LinkedHashMap<>();
         //we use the words that correspond to the first 30 entries of listtfidf
-        for (int x=0; x<30; x++) {
+        for (int x=0; x<=20; x++) {
             finalmap.put(map_tfidf.get(listtfidf.get(x)), new Double(Math.round(100*listtfidf.get(x).floatValue())/100.00));
         }
         return finalmap;

@@ -10,6 +10,7 @@ public class Business {
     String businessName;
     String businessAddress;
     String reviews;
+    double tfidf;
     int reviewCharCount;
     Map<String, Double> tfidfmap;
 
@@ -39,6 +40,14 @@ public class Business {
 
     public void settfidfmap(Map<String, Double> tfidfmap) {
         this.tfidfmap = tfidfmap;
+    }
+
+    public void assigntfidf(String query) {
+        for (String s: tfidfmap.keySet()) {
+            if (s.equals(query)) {
+                tfidf = tfidfmap.get(s);
+            }
+        }
     }
 
     public String toString() {

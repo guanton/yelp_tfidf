@@ -17,7 +17,8 @@ public class SearchEngine {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                yp.txtToString();
+                String query = textField.getText();
+                yp.txtToString(textField.getText());
                 for (Business b: yp.filtertop10()) {
                     b.settfidfmap(yp.top30words(b));
                     System.out.println(b);
@@ -28,7 +29,6 @@ public class SearchEngine {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String query = textField.getText();
-                System.out.println(query);
             }
         });
     }
