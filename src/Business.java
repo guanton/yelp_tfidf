@@ -1,3 +1,5 @@
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class Business {
@@ -51,17 +53,22 @@ public class Business {
     }
 
     public void assigntfidf(String query) {
+        List<String> keyWords = Arrays.asList(query.split(" "))       ;
         for (String s: tfidfmap.keySet()) {
-            if (s.equals(query)) {
-                tfidf = tfidfmap.get(s);
-            }
+            for (String keyWord: keyWords) {
+                if (s.equals(keyWord)) {
+                    tfidf = tfidf + tfidfmap.get(s);
+            }   }
         }
     }
 
     public void assignFr(String query) {
+        List<String> keyWords = Arrays.asList(query.split(" "));
         for (String s: freqratio.keySet()) {
-            if (s.equals(query)) {
-                fr = freqratio.get(s);
+            for (String keyWord: keyWords) {
+                if (s.equals(keyWord)) {
+                    fr = fr + freqratio.get(keyWord);
+                }
             }
         }
     }

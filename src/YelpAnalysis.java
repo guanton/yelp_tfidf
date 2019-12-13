@@ -23,12 +23,10 @@ public class YelpAnalysis {
     private Queue<Business> checkBusinesses = new PriorityQueue<>(srcc);
 
 
-    //testing: running this systematically prints the data from the top 10 businesses (most characters in reviews)
-    //in particular, it prints out a list of the keywords associated to eachbusiness
-
+    //search
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
-        yp.txtToString("pizza");
+        yp.txtToString("bakery greek");
         for (Business b: yp.businesses) {
             System.out.println(b);
         }
