@@ -20,7 +20,6 @@ public class SearchEngine {
                 String query = textField.getText();
                 yp.txtToString(textField.getText());
                 for (Business b: yp.filtertop10()) {
-                    b.settfidfmap(yp.top30words(b));
                     System.out.println(b);
                 }
             }

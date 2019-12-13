@@ -10,8 +10,11 @@ public class Business {
     String businessName;
     String businessAddress;
     String reviews;
+    double fr;
+    int numwords;
     double tfidf;
     int reviewCharCount;
+    Map<String, Double> freqratio;
     Map<String, Double> tfidfmap;
 
     public Business(String businessID, String businessName, String businessAddress, String reviews, int reviewCharCount,
@@ -23,6 +26,11 @@ public class Business {
         this.reviewCharCount = reviewCharCount;
         this.tfidfmap = idfmap;
     }
+
+    public void setFreqratio(Map<String, Double> d) {
+        freqratio = d;
+    }
+    public void setNumWords(int n) {numwords = n;}
 
     //converts the map of words with their tfidf scores to a string
     public String maptostring(Map<String, Double> tfidfmap) {
@@ -46,6 +54,14 @@ public class Business {
         for (String s: tfidfmap.keySet()) {
             if (s.equals(query)) {
                 tfidf = tfidfmap.get(s);
+            }
+        }
+    }
+
+    public void assignFr(String query) {
+        for (String s: freqratio.keySet()) {
+            if (s.equals(query)) {
+                fr = freqratio.get(s);
             }
         }
     }

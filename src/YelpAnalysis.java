@@ -1,8 +1,11 @@
+import com.google.common.collect.MinMaxPriorityQueue;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
 
 
 public class YelpAnalysis {
@@ -14,8 +17,9 @@ public class YelpAnalysis {
     //we will sort our businesses in order of decreasing number of characters in their reviews
     SortByReviewCharCount srcc = new SortByReviewCharCount();
     SortByTfidf stfidf = new SortByTfidf();
+    SortByFreqRatio sbfr = new SortByFreqRatio();
     //a priority Queue representing every business in the .txt file
-    private Queue<Business> businesses = new PriorityQueue<>(stfidf.reversed());
+    private MinMaxPriorityQueue<Business> businesses = MinMaxPriorityQueue.orderedBy(sbfr.reversed()).maximumSize(10).create();
     private Queue<Business> checkBusinesses = new PriorityQueue<>(srcc);
 
 
@@ -24,20 +28,12 @@ public class YelpAnalysis {
 
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
-        yp.txtToString("restaurant");
-        for (Business b: yp.filtertop10()) {
+        yp.txtToString("pizza");
+        for (Business b: yp.businesses) {
             System.out.println(b);
         }
     }
 
-
-    public void checkScore(Business b) {
-        for (Double d: b.tfidfmap.values()) {
-            if (d > 10) {
-                b.settfidfmap(this.top30words(b));
-            }
-        }
-    }
 
 
     //this method constructs one String for each Business in the .txt file (dataset), and then
@@ -57,33 +53,21 @@ public class YelpAnalysis {
                 }
                 char result = (char) res;  //reads the next character in the file
 
-
                 // if there are no more characters in the file, then result will be -1, and we exit the loop
                 //since the format of the text in the file is {, Business info, }, {, Business info, }, ...
                 // we can build a string representing each business by looking inside the brackets
-
 
                 if (result == '{') {
                     continue;
                 }
                 if (result == '}') {
                     Business b = strToBusiness(sb.toString());
-                    b.settfidfmap(this.top30words(b));
+                    b.setFreqratio(freqratio(b));
+                    b.assignFr(query);
+                    b.settfidfmap(this.top30Words(b));
                     b.assigntfidf(query);
-                    businesses.add(b);
-//                    boolean include = false;
-//                    for (Business bu: businesses) {
-//                        if (bu.tfidf <= b.tfidf) {
-//                            include = true;
-//                        }
-//                    }
-//                    if (include){
-//                        businesses.add(b);
-//                    }
-//                     //construct a business with sb
-//                    if (businesses.size() > 10) {
-//                        businesses.remove();
-//                    }
+                    businesses.offer(b);
+                     //construct a business with sb
                     sb = new StringBuilder();
                     continue;
                 } else {
@@ -124,9 +108,8 @@ public class YelpAnalysis {
                 reviews = BusFieldStrings.get(x).trim();
                 reviewCharCount = charCount(reviews);
                 //updates dictionary
-                this.dictionaryHelper(reviews);
                 b = new Business(businessID, businessName, businessAddress, reviews, reviewCharCount, null);
-//                System.out.println(b);
+                b.setNumWords(this.dictionaryHelper(reviews));
             }
         }
         return b;
@@ -138,9 +121,10 @@ public class YelpAnalysis {
     }
 
     //updates the dictionary with a new batch of reviews
-    public void dictionaryHelper(String reviews) {
+    public int dictionaryHelper(String reviews) {
         //split the reviews into a list of individual words
         List<String> wordsInReviews = Arrays.asList(reviews.split(" "));
+        int numWords = wordsInReviews.size();
         // this removes duplicate words in the batch of reviews (we don't want to double count words from one batch
         // of reviews)
         List<String> wordsInReviews_noDups = new ArrayList<>();
@@ -159,6 +143,7 @@ public class YelpAnalysis {
                 dictionary.put(s.toLowerCase(), new Integer(dictionary.get(s).intValue() + 1));
             }
         }
+        return numWords;
     }
 
 
@@ -175,7 +160,7 @@ public class YelpAnalysis {
     }
 
     // this method creates a map where the keys are words in a business' reviews and the values are their tf-idf scores
-    public Map<String, Double> top30words(Business b) {
+    public Map<String, Double> top30Words(Business b) {
         //store all the words in the reviews in a list
         List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
         //first, create a map that correlates each word to the number of times it appears in a business' reviews
@@ -220,6 +205,27 @@ public class YelpAnalysis {
             finalmap.put(map_tfidf.get(listtfidf.get(x)), new Double(Math.round(100*listtfidf.get(x).floatValue())/100.00));
         }
         return finalmap;
+    }
+
+
+    public Map<String, Double> freqratio(Business b) {
+        //store all the words in the reviews in a list
+        List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
+        //first, create a map that correlates each word to the number of times it appears in a business' reviews
+        Map<String, Integer> wordFrequencies = new HashMap<>();
+        for (String s: wordsInReviews) {
+            if (!wordFrequencies.containsKey(s)) {
+                wordFrequencies.put(s, new Integer(1));
+            } else {
+                wordFrequencies.put(s, new Integer(wordFrequencies.get(s).intValue()+1));
+            }
+        }
+        Map<String, Double> ratioMap = new HashMap<>();
+        for (String s: wordFrequencies.keySet()){
+            Double d = wordFrequencies.get(s)/(double) b.numwords;
+            ratioMap.put(s, d);
+        }
+        return ratioMap;
     }
 
 
