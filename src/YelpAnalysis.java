@@ -14,34 +14,47 @@ public class YelpAnalysis {
     //a dictionary containing every word that makes an appearance in the reviews contained in the dataset along with
     //the number of restaurants in the dataset whose reviews contain the word
     private Map<String, Integer> dictionary = new HashMap<>();
-    //we will sort our businesses in order of decreasing number of characters in their reviews
+    //different comparators to sort businesses by
     SortByReviewCharCount srcc = new SortByReviewCharCount();
     SortByTfidf stfidf = new SortByTfidf();
     SortByFreqRatio sbfr = new SortByFreqRatio();
     //a priority Queue representing every business in the .txt file
-    private MinMaxPriorityQueue<Business> businesses = MinMaxPriorityQueue.orderedBy(sbfr.reversed()).maximumSize(10).create();
+    private MinMaxPriorityQueue<Business> businesses;
     private Queue<Business> checkBusinesses = new PriorityQueue<>(srcc);
+    private boolean freqmode;
 
 
     //search
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
+        yp.init(false);
         yp.txtToString("bakery greek");
         for (Business b: yp.businesses) {
             System.out.println(b);
         }
     }
 
+    public void init(boolean mode){
+        freqmode = mode;
+        if (freqmode) {
+            businesses = MinMaxPriorityQueue.orderedBy(sbfr.reversed()).maximumSize(10).create();
+        } else {
+            businesses = MinMaxPriorityQueue.orderedBy(stfidf.reversed()).maximumSize(10).create();
+        }
+    }
 
+    public MinMaxPriorityQueue<Business> getBusinesses() {
+        return businesses;
+    }
 
     //this method constructs one String for each Business in the .txt file (dataset), and then
     //sends each String as a parameter to the method strToBusiness to construct a list of Businesses
-
     public void txtToString(String query) {
         InputStream in = null;
         StringBuilder sb = new StringBuilder();
         try {
             //set the input stream to the file containing the dataset
+            //C:\Users\Pengfei\Desktop\yelpDatasetParsed_medium.txt
             in = new FileInputStream("yelpDatasetParsed_full.txt");
             in = new BufferedInputStream(in);
             while (true) {
@@ -59,9 +72,12 @@ public class YelpAnalysis {
                     continue;
                 }
                 if (result == '}') {
+                    //construct a business object
                     Business b = strToBusiness(sb.toString());
-                    b.setFreqratio(freqratio(b));
-                    b.assignFr(query);
+                    if (freqmode) {
+                        b.setFreqratio(freqratio(b));
+                        b.assignFr(query);
+                    }
                     b.settfidfmap(this.top30Words(b));
                     b.assigntfidf(query);
                     businesses.offer(b);
@@ -162,33 +178,16 @@ public class YelpAnalysis {
         //store all the words in the reviews in a list
         List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
         //first, create a map that correlates each word to the number of times it appears in a business' reviews
-        Map<String, Integer> wordFrequencies = new HashMap<>();
-        for (String s: wordsInReviews) {
-            if (!wordFrequencies.containsKey(s)) {
-                wordFrequencies.put(s, new Integer(1));
-            } else {
-                wordFrequencies.put(s, new Integer(wordFrequencies.get(s).intValue()+1));
-            }
-        }
+        Map<String, Integer> wordFrequencies = generateWordFreqMap(wordsInReviews);
         //now, we compute the tf-idf scores
         Map<Double, String> map_tfidf = new HashMap<>();
         for (String s : wordFrequencies.keySet()) {
             Double tfidf;
             //only assign a non-0 idf score if the word appears in at least 5 documents in the .txt file
             if (dictionary.get(s).intValue()>=5) {
-                boolean inMap = true;
                 tfidf = new Double(wordFrequencies.get(s).doubleValue() / dictionary.get(s).doubleValue());
-                while (inMap) {
-                    if (!map_tfidf.keySet().contains(tfidf)) {
-                        inMap = false;
-                    } else {
-                        tfidf = tfidf + 0.00001;
-                    }
-                }
             } else {
-                Random r = new Random();
-                Double rd = r.nextDouble();
-                tfidf = new Double(rd);
+                tfidf = new Double(0);
             }
             map_tfidf.put(tfidf, s);
         }
@@ -199,17 +198,14 @@ public class YelpAnalysis {
         //prepare the map that we will return
         Map<String, Double> finalmap = new LinkedHashMap<>();
         //we use the words that correspond to the first 30 entries of listtfidf
-        for (int x=0; x<=20; x++) {
+        int min = Math.min(20, listtfidf.size()-1);
+        for (int x=0; x<=min; x++) {
             finalmap.put(map_tfidf.get(listtfidf.get(x)), new Double(Math.round(100*listtfidf.get(x).floatValue())/100.00));
         }
         return finalmap;
     }
 
-
-    public Map<String, Double> freqratio(Business b) {
-        //store all the words in the reviews in a list
-        List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
-        //first, create a map that correlates each word to the number of times it appears in a business' reviews
+    public Map<String, Integer> generateWordFreqMap(List<String> wordsInReviews) {
         Map<String, Integer> wordFrequencies = new HashMap<>();
         for (String s: wordsInReviews) {
             if (!wordFrequencies.containsKey(s)) {
@@ -218,6 +214,14 @@ public class YelpAnalysis {
                 wordFrequencies.put(s, new Integer(wordFrequencies.get(s).intValue()+1));
             }
         }
+        return wordFrequencies;
+    }
+
+    public Map<String, Double> freqratio(Business b) {
+        //store all the words in the reviews in a list
+        List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
+        //first, create a map that correlates each word to the number of times it appears in a business' reviews
+        Map<String, Integer> wordFrequencies = generateWordFreqMap(wordsInReviews);
         Map<String, Double> ratioMap = new HashMap<>();
         for (String s: wordFrequencies.keySet()){
             Double d = wordFrequencies.get(s)/(double) b.numwords;
