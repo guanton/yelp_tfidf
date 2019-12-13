@@ -18,11 +18,11 @@ public class SearchEngine {
 
 
     public SearchEngine() {
-        yp = new YelpAnalysis();
         //search button
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                yp = new YelpAnalysis();
                 query = textField.getText();
                 yp.init(false);
                 yp.txtToString(query);
@@ -50,12 +50,16 @@ public class SearchEngine {
     private class searchPanel extends javax.swing.JPanel {
         private searchPanel(MinMaxPriorityQueue businesses) {
             //initialize empty board with extra row for buttons
-            this.setLayout(new GridLayout(10,1));
+            this.setLayout(new GridLayout(10,2));
 
             //make row with only Play button (or no play button if there is no human)
             for (int i = 1; i <= 10; i++) {
                 Business b = yp.getBusinesses().removeFirst();
-                this.add(new JLabel(" " + i + ". " + b.businessName + ", " + b.businessAddress + " " + b.tfidfmap));
+                JLabel label = new JLabel();
+                String text = i + ". " + b.businessName + "\n" + b.businessAddress + " ";
+                label.setText("<html>" + text.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
+                this.add(label);
+
             }
 
         }

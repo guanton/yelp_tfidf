@@ -194,7 +194,8 @@ public class YelpAnalysis {
         Map<String, Double> tfidfMap = new HashMap<>();
         List<String> keyWords = Arrays.asList(query.split(" "));
         for (String keyWord: keyWords) {
-            double tfidf = (double) b.getTfMap().get(keyWord) / (double) dictionary.get(keyWord);
+            double unroundedtfidf = (double) b.getTfMap().get(keyWord) / (double) dictionary.get(keyWord);
+            double tfidf = Math.round(unroundedtfidf*100.0)/100.0;
             tfidfMap.put(keyWord, tfidf);
         }
         return tfidfMap;
