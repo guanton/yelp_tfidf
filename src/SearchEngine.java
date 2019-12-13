@@ -53,9 +53,9 @@ public class SearchEngine {
             this.setLayout(new GridLayout(10,1));
 
             //make row with only Play button (or no play button if there is no human)
-            for (int i = 0; i < 10; i++) {
+            for (int i = 1; i <= 10; i++) {
                 Business b = yp.getBusinesses().removeFirst();
-                this.add(new JLabel(b.businessName));
+                this.add(new JLabel(" " + i + ". " + b.businessName + ", " + b.businessAddress + " " + b.tfidfmap));
             }
 
         }
