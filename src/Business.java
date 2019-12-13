@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ public class Business {
     double fr;
     int numwords;
     double tfidf;
+    Map<String, Integer> tfMap = new HashMap<>();
     int reviewCharCount;
     Map<String, Double> freqratio;
     Map<String, Double> tfidfmap;
@@ -33,6 +35,12 @@ public class Business {
         freqratio = d;
     }
     public void setNumWords(int n) {numwords = n;}
+    public void setTfMap(Map<String, Integer> tfMap) {
+        this.tfMap = tfMap;
+    }
+    public Map<String, Integer> getTfMap() {
+        return tfMap;
+    }
 
     //converts the map of words with their tfidf scores to a string
     public String maptostring(Map<String, Double> tfidfmap) {
@@ -52,16 +60,6 @@ public class Business {
         this.tfidfmap = tfidfmap;
     }
 
-    public void assigntfidf(String query) {
-        List<String> keyWords = Arrays.asList(query.split(" "))       ;
-        for (String s: tfidfmap.keySet()) {
-            for (String keyWord: keyWords) {
-                if (s.equals(keyWord)) {
-                    tfidf = tfidf + tfidfmap.get(s);
-            }   }
-        }
-    }
-
     public void assignFr(String query) {
         List<String> keyWords = Arrays.asList(query.split(" "));
         for (String s: freqratio.keySet()) {
@@ -72,6 +70,15 @@ public class Business {
             }
         }
     }
+
+    public void assignTfidf() {
+        double sumTfidf = 0;
+        for (String s: tfidfmap.keySet()) {
+            sumTfidf = sumTfidf + tfidfmap.get(s);
+        }
+        tfidf = sumTfidf;
+    }
+
 
     public String toString() {
         return "-------------------------------------------------------------------------------\n"

@@ -22,13 +22,16 @@ public class YelpAnalysis {
     private MinMaxPriorityQueue<Business> businesses;
     private Queue<Business> checkBusinesses = new PriorityQueue<>(srcc);
     private boolean freqmode;
+    private Set<Business> businessSet = new HashSet<>();
 
 
     //search
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
         yp.init(false);
-        yp.txtToString("bakery greek");
+        String query = "pizza hut";
+        yp.txtToString(query);
+        yp.secondPass(query);
         for (Business b: yp.businesses) {
             System.out.println(b);
         }
@@ -43,8 +46,20 @@ public class YelpAnalysis {
         }
     }
 
+    public void secondPass(String query) {
+        for (Business b: businessSet) {
+            b.settfidfmap(tfidfcalculator(b, query));
+            b.assignTfidf();
+            businesses.offer(b);
+        }
+    }
+
     public MinMaxPriorityQueue<Business> getBusinesses() {
         return businesses;
+    }
+
+    public Set<Business> getBusinessSet() {
+        return businessSet;
     }
 
     //this method constructs one String for each Business in the .txt file (dataset), and then
@@ -78,9 +93,8 @@ public class YelpAnalysis {
                         b.setFreqratio(freqratio(b));
                         b.assignFr(query);
                     }
-                    b.settfidfmap(this.top30Words(b));
-                    b.assigntfidf(query);
-                    businesses.offer(b);
+                    b.setTfMap(tfcalculator(b, query));
+                    businessSet.add(b);
                      //construct a business with sb
                     sb = new StringBuilder();
                     continue;
@@ -160,50 +174,33 @@ public class YelpAnalysis {
         return numWords;
     }
 
-
-
-    //extracts an ordered list of the top 10 businesses related to the query (highest tf-idf)
-    public List<Business> filtertop10() {
-        List<Business> top10 = new ArrayList<>();
-        for (int x = 0; x < 10; x++) {
-            top10.add(businesses.peek());
-            businesses.remove();
-
-        }
-        return top10;
-    }
-
-    // this method creates a map where the keys are words in a business' reviews and the values are their tf-idf scores
-    public Map<String, Double> top30Words(Business b) {
-        //store all the words in the reviews in a list
+    public Map<String, Integer> tfcalculator(Business b, String query) {
+        Map<String, Integer> tfMap = new HashMap<>();
         List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
-        //first, create a map that correlates each word to the number of times it appears in a business' reviews
-        Map<String, Integer> wordFrequencies = generateWordFreqMap(wordsInReviews);
-        //now, we compute the tf-idf scores
-        Map<Double, String> map_tfidf = new HashMap<>();
-        for (String s : wordFrequencies.keySet()) {
-            Double tfidf;
-            //only assign a non-0 idf score if the word appears in at least 5 documents in the .txt file
-            if (dictionary.get(s).intValue()>=5) {
-                tfidf = new Double(wordFrequencies.get(s).doubleValue() / dictionary.get(s).doubleValue());
-            } else {
-                tfidf = new Double(0);
+        List<String> keyWords = Arrays.asList(query.split(" "));
+        for (String keyWord: keyWords) {
+            int tf = 0;
+            for (String s: wordsInReviews) {
+                if (s.equals(keyWord)) {
+                    tf++;
+                }
+                tfMap.put(keyWord, tf);
             }
-            map_tfidf.put(tfidf, s);
         }
-
-        //now, store the idf's into a list so that we can sort them in decreasing order
-        List<Double> listtfidf = new ArrayList<>(map_tfidf.keySet());
-        Collections.sort(listtfidf, Collections.reverseOrder());
-        //prepare the map that we will return
-        Map<String, Double> finalmap = new LinkedHashMap<>();
-        //we use the words that correspond to the first 30 entries of listtfidf
-        int min = Math.min(20, listtfidf.size()-1);
-        for (int x=0; x<=min; x++) {
-            finalmap.put(map_tfidf.get(listtfidf.get(x)), new Double(Math.round(100*listtfidf.get(x).floatValue())/100.00));
-        }
-        return finalmap;
+        return tfMap;
     }
+
+    public Map<String, Double> tfidfcalculator(Business b, String query) {
+        Map<String, Double> tfidfMap = new HashMap<>();
+        List<String> keyWords = Arrays.asList(query.split(" "));
+        for (String keyWord: keyWords) {
+            double tfidf = (double) b.getTfMap().get(keyWord) / (double) dictionary.get(keyWord);
+            tfidfMap.put(keyWord, tfidf);
+        }
+        return tfidfMap;
+    }
+
+
 
     public Map<String, Integer> generateWordFreqMap(List<String> wordsInReviews) {
         Map<String, Integer> wordFrequencies = new HashMap<>();

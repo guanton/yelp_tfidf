@@ -24,9 +24,9 @@ public class SearchEngine {
             @Override
             public void actionPerformed(ActionEvent e) {
                 query = textField.getText();
-                System.out.println(query);
                 yp.init(false);
                 yp.txtToString(query);
+                yp.secondPass(query);
                 sp = new searchPanel(yp.getBusinesses());
                 displayResults();
             }
