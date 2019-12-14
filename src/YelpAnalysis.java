@@ -4,7 +4,11 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.*;
+
 
 
 
@@ -24,17 +28,27 @@ public class YelpAnalysis {
     private boolean freqmode;
     private Set<Business> businessSet = new HashSet<>();
 
-
     //search
     public static void main(String[] args) {
         YelpAnalysis yp = new YelpAnalysis();
         yp.init(false);
         String query = "pizza hut";
         yp.txtToString(query);
+        JSONArray saves = new JSONArray();
         yp.secondPass(query);
-        for (Business b: yp.businesses) {
-            System.out.println(b);
+        for (Business b : yp.businessSet) {
+            JSONObject business = new JSONObject();
+            business.put("name", b.businessName);
+            business.put("address", b.businessAddress);
+            business.put("tfidf", b.tfidfmap);
+            saves.put(business);
+            System.out.println(business);
         }
+//        for (Business b: yp.businesses) {
+////            System.out.println(b);
+//        }
+
+
     }
 
     public void init(boolean mode){
@@ -48,14 +62,15 @@ public class YelpAnalysis {
 
     public void secondPass(String query) {
         for (Business b: businessSet) {
-            b.settfidfmap(tfidfcalculator(b, query));
+            b.settfidfmap(tfidfcalculator(b));
             b.assignTfidf();
-            businesses.offer(b);
+//            businesses.offer(b);
         }
     }
 
     public MinMaxPriorityQueue<Business> getBusinesses() {
         return businesses;
+
     }
 
     public Set<Business> getBusinessSet() {
@@ -93,7 +108,7 @@ public class YelpAnalysis {
                         b.setFreqratio(freqratio(b));
                         b.assignFr(query);
                     }
-                    b.setTfMap(tfcalculator(b, query));
+                    b.setTfMap(tfcalculator(b));
                     businessSet.add(b);
                      //construct a business with sb
                     sb = new StringBuilder();
@@ -174,26 +189,29 @@ public class YelpAnalysis {
         return numWords;
     }
 
-    public Map<String, Integer> tfcalculator(Business b, String query) {
+
+
+    public Map<String, Integer> tfcalculator(Business b) {
         Map<String, Integer> tfMap = new HashMap<>();
         List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
-        List<String> keyWords = Arrays.asList(query.split(" "));
-        for (String keyWord: keyWords) {
+        Set<String> wordsInReviewsNoDups = new HashSet<String>(wordsInReviews);
+        for (String word: wordsInReviewsNoDups) {
             int tf = 0;
             for (String s: wordsInReviews) {
-                if (s.equals(keyWord)) {
+                if (s.equals(word)) {
                     tf++;
                 }
-                tfMap.put(keyWord, tf);
             }
+            tfMap.put(word, tf);
         }
         return tfMap;
     }
 
-    public Map<String, Double> tfidfcalculator(Business b, String query) {
-        Map<String, Double> tfidfMap = new HashMap<>();
-        List<String> keyWords = Arrays.asList(query.split(" "));
-        for (String keyWord: keyWords) {
+    public TreeMap<String, Double> tfidfcalculator(Business b) {
+        Map<String, Double> tfidfMap = new TreeMap<>();
+        List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
+        Set<String> wordsInReviewsNoDups = new HashSet<String>(wordsInReviews);
+        for (String keyWord: wordsInReviewsNoDups) {
             double unroundedtfidf = (double) b.getTfMap().get(keyWord) / (double) dictionary.get(keyWord);
             double tfidf = Math.round(unroundedtfidf*100.0)/100.0;
             tfidfMap.put(keyWord, tfidf);

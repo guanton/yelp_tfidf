@@ -56,7 +56,7 @@ public class SearchEngine {
             for (int i = 1; i <= 10; i++) {
                 Business b = yp.getBusinesses().removeFirst();
                 JLabel label = new JLabel();
-                String text = i + ". " + b.businessName + "\n" + b.businessAddress + " ";
+                String text = i + ". " + b.businessName + "\n" + b.businessAddress + " " +b.tfidfmap;
                 label.setText("<html>" + text.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
                 this.add(label);
 
@@ -71,7 +71,6 @@ public class SearchEngine {
         f = new JFrame("Results for " + query);
         f.setContentPane(sp);
         f.setSize(800, 600);
-        f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         f.setVisible(true);
     }
 

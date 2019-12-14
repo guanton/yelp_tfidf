@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Business {
     //each business in the dataset has an ID, a name, an address, a list of reviews (String), a number of reviews,
@@ -19,10 +16,10 @@ public class Business {
     Map<String, Integer> tfMap = new HashMap<>();
     int reviewCharCount;
     Map<String, Double> freqratio;
-    Map<String, Double> tfidfmap;
+    TreeMap<String, Double> tfidfmap;
 
     public Business(String businessID, String businessName, String businessAddress, String reviews, int reviewCharCount,
-                    Map<String, Double> idfmap) {
+                    TreeMap<String, Double> idfmap) {
         this.businessID = businessID;
         this.businessName = businessName;
         this.businessAddress = businessAddress;
@@ -56,7 +53,7 @@ public class Business {
         return s;
     }
 
-    public void settfidfmap(Map<String, Double> tfidfmap) {
+    public void settfidfmap(TreeMap<String, Double> tfidfmap) {
         this.tfidfmap = tfidfmap;
     }
 
