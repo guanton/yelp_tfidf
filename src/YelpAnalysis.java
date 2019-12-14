@@ -1,13 +1,12 @@
 import com.google.common.collect.MinMaxPriorityQueue;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
+import org.apache.wink.json4j.OrderedJSONObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.*;
+import org.apache.wink.*;
 
 
 
@@ -42,7 +41,13 @@ public class YelpAnalysis {
             business.put("address", b.businessAddress);
             business.put("tfidf", b.tfidfmap);
             saves.put(business);
-            System.out.println(business);
+        }
+        try(FileWriter file = new FileWriter("myJSON.json")) {
+            file.write(saves.toString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+
         }
 //        for (Business b: yp.businesses) {
 ////            System.out.println(b);
@@ -208,7 +213,7 @@ public class YelpAnalysis {
     }
 
     public TreeMap<String, Double> tfidfcalculator(Business b) {
-        Map<String, Double> tfidfMap = new TreeMap<>();
+        TreeMap<String, Double> tfidfMap = new TreeMap<>();
         List<String> wordsInReviews = Arrays.asList(b.reviews.split(" "));
         Set<String> wordsInReviewsNoDups = new HashSet<String>(wordsInReviews);
         for (String keyWord: wordsInReviewsNoDups) {
