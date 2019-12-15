@@ -28,19 +28,23 @@ public class YelpAnalysis {
     private Set<Business> businessSet = new HashSet<>();
 
     //search
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception  {
         YelpAnalysis yp = new YelpAnalysis();
         yp.init(false);
         String query = "pizza hut";
         yp.txtToString(query);
-        JSONArray saves = new JSONArray();
+        OrderedJSONObject saves = new OrderedJSONObject();
         yp.secondPass(query);
+        int x = 1;
         for (Business b : yp.businessSet) {
-            JSONObject business = new JSONObject();
-            business.put("name", b.businessName);
-            business.put("address", b.businessAddress);
-            business.put("tfidf", b.tfidfmap);
-            saves.put(business);
+            OrderedJSONObject business = new OrderedJSONObject();
+            business.put("business_name", b.businessName);
+            business.put("business_address", b.businessAddress);
+            for (String s: b.tfidfmap.keySet()) {
+                business.put(s, b.tfidfmap.get(s));
+            }
+            saves.put(Integer.toString(x), business);
+            x++;
         }
         try(FileWriter file = new FileWriter("myJSON.json")) {
             file.write(saves.toString());

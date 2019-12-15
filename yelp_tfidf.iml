@@ -10,5 +10,6 @@
     <orderEntry type="library" exported="" name="com.google.guava:guava:23.0" level="project" />
     <orderEntry type="library" name="json" level="project" />
     <orderEntry type="library" name="org.apache.wink:wink-json4j:1.2.1-incubating" level="project" />
+    <orderEntry type="library" name="org.apache.camel:json-simple-ordered:2.24.1" level="project" />
   </component>
 </module>

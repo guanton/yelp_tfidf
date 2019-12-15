@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="org.apache.camel:json-simple-ordered:2.24.1" type="repository">
+    <properties maven-id="org.apache.camel:json-simple-ordered:2.24.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/json-simple-ordered-2.24.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-core-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-impl-2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
