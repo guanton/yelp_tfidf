@@ -15,6 +15,7 @@ public class SearchEngine {
     private JLabel[] outputs;
     private String query;
     private searchPanel sp;
+    private boolean noResult;
 
 
     public SearchEngine() {
@@ -22,22 +23,42 @@ public class SearchEngine {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                yp = new YelpAnalysis();
-                query = textField.getText();
-                yp.init(false);
-                yp.txtToString(query);
-                yp.secondPass(query);
-                sp = new searchPanel(yp.getBusinesses());
-                displayResults();
+                searchOperation();
             }
         });
         textField.addActionListener(new ActionListener() {
             @Override
+            //enter key
             public void actionPerformed(ActionEvent e) {
-                query = textField.getText();
+                searchOperation();
             }
         });
     }
+
+    public void searchOperation() {
+        double time1 = System.currentTimeMillis();
+        yp = new YelpAnalysis();
+        query = textField.getText();
+        yp.init(false);
+        yp.txtToString(query);
+//        double time2 = System.currentTimeMillis();
+//        System.out.println(time2-time1);
+        try {
+            yp.secondPass(query);
+            double time3 = System.currentTimeMillis();
+//            System.out.println(time3-time2);
+        } catch (NullPointerException err) {
+            noResult = true;
+            JOptionPane.showMessageDialog(f, "No businesses found with the keywords: " + "\"" + query + "\"");
+        }
+        sp = new searchPanel(yp.getBusinesses());
+        if (!noResult) {
+            displayResults();
+        }
+//        System.out.println(System.currentTimeMillis()-time1);
+
+    }
+
 
     public void display(){
         f = new JFrame("Yelp Search");
@@ -54,12 +75,14 @@ public class SearchEngine {
 
             //make row with only Play button (or no play button if there is no human)
             for (int i = 1; i <= 10; i++) {
-                Business b = yp.getBusinesses().removeFirst();
-                JLabel label = new JLabel();
-                String text = i + ". " + b.businessName + "\n" + b.businessAddress + " " +b.tfidfmap;
-                label.setText("<html>" + text.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
-                this.add(label);
-
+                if (yp.getBusinesses().size() != 0) {
+                    Business b = yp.getBusinesses().removeFirst();
+                    JLabel label = new JLabel();
+                    String text = i + ". " + b.businessName + "\n" + b.businessAddress + " ";
+                    label.setText("<html>" + text.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
+                    this.add(label);
+                    noResult = false;
+                }
             }
 
         }

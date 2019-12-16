@@ -7,19 +7,20 @@ public class CreateJSONFile {
     public static void main(String[] args) throws Exception  {
         YelpAnalysis yp = new YelpAnalysis();
         yp.init(false);
-        String query = "pizza hut";
+        String query = "";
         yp.txtToString(query);
         OrderedJSONObject saves = new OrderedJSONObject();
         yp.secondPass(query);
         int x = 1;
         for (Business b : yp.businessSet) {
             OrderedJSONObject business = new OrderedJSONObject();
-            business.put("business_name", b.businessName);
-            business.put("business_address", b.businessAddress);
             for (String s: b.tfidfmap.keySet()) {
                 business.put(s, b.tfidfmap.get(s));
             }
-            saves.put(Integer.toString(x), business);
+            business.put("business_name", b.businessName);
+            business.put("business_address", b.businessAddress);
+            //"%^" is a special character reserved for prefacing each Business Object
+            saves.put("%^" + x, business);
             x++;
         }
         try(FileWriter file = new FileWriter("myJSON.json")) {

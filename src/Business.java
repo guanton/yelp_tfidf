@@ -28,6 +28,14 @@ public class Business {
         this.tfidfmap = idfmap;
     }
 
+    //other constructor for json
+    public Business(String businessName, String businessAddress,
+                    TreeMap<String, Double> idfmap) {
+        this.businessName = businessName;
+        this.businessAddress = businessAddress;
+        this.tfidfmap = idfmap;
+    }
+
     public void setFreqratio(Map<String, Double> d) {
         freqratio = d;
     }
