@@ -193,7 +193,9 @@ public class YelpAnalysis {
         for (String keyWord: wordsInReviewsNoDups) {
             double unroundedtfidf = (double) b.getTfMap().get(keyWord) / (double) dictionary.get(keyWord);
             double tfidf = Math.round(unroundedtfidf*100.0)/100.0;
-            tfidfMap.put(keyWord, tfidf);
+            if (tfidf >= 0.005) {
+                tfidfMap.put(keyWord, tfidf);
+            }
         }
         return tfidfMap;
     }
