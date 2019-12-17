@@ -40,11 +40,11 @@ public class SearchEngine {
         pjf = new ParseJSONFile();
         query = textField.getText();
         pjf.parseJson();
-        double time2 = System.currentTimeMillis();
-        System.out.println(time2-time1);
+//        double time2 = System.currentTimeMillis();
+//        System.out.println(time2-time1);
         try {
             pjf.search(query);
-            double time3 = System.currentTimeMillis();
+//            double time3 = System.currentTimeMillis();
 //            System.out.println(time3-time2);
         } catch (NullPointerException err) {
             noResult = true;
