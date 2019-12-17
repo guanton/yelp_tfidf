@@ -11,7 +11,7 @@ public class SearchEngine {
     private JPanel panelMain;
     private JTextField textField;
     private JPanel pan;
-    private YelpAnalysis yp;
+    private ParseJSONFile pjf;
     private JLabel[] outputs;
     private String query;
     private searchPanel sp;
@@ -37,21 +37,20 @@ public class SearchEngine {
 
     public void searchOperation() {
         double time1 = System.currentTimeMillis();
-        yp = new YelpAnalysis();
+        pjf = new ParseJSONFile();
         query = textField.getText();
-        yp.init(false);
-        yp.txtToString(query);
-//        double time2 = System.currentTimeMillis();
-//        System.out.println(time2-time1);
+        pjf.parseJson();
+        double time2 = System.currentTimeMillis();
+        System.out.println(time2-time1);
         try {
-            yp.secondPass(query);
+            pjf.search(query);
             double time3 = System.currentTimeMillis();
 //            System.out.println(time3-time2);
         } catch (NullPointerException err) {
             noResult = true;
             JOptionPane.showMessageDialog(f, "No businesses found with the keywords: " + "\"" + query + "\"");
         }
-        sp = new searchPanel(yp.getBusinesses());
+        sp = new searchPanel(pjf.getBusinesses());
         if (!noResult) {
             displayResults();
         }
@@ -75,8 +74,8 @@ public class SearchEngine {
 
             //make row with only Play button (or no play button if there is no human)
             for (int i = 1; i <= 10; i++) {
-                if (yp.getBusinesses().size() != 0) {
-                    Business b = yp.getBusinesses().removeFirst();
+                if (pjf.getBusinesses().size() != 0) {
+                    Business b = pjf.getBusinesses().removeFirst();
                     JLabel label = new JLabel();
                     String text = i + ". " + b.businessName + "\n" + b.businessAddress + " ";
                     label.setText("<html>" + text.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");

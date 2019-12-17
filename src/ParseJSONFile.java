@@ -113,6 +113,10 @@ public class ParseJSONFile {
         return tfidfmap;
     }
 
+    public MinMaxPriorityQueue<Business> getBusinesses() {
+        return businesses;
+    }
+
 
 
 
