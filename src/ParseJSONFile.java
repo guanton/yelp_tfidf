@@ -5,13 +5,16 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.MinMaxPriorityQueue;
 
+import javax.xml.soap.Node;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ParseJSONFile {
 
@@ -35,12 +38,31 @@ public class ParseJSONFile {
             //skip preliminary brackets
             jParser.nextToken();
             jParser.nextToken();
-            jParser.nextToken();
+            boolean businessdone = false;
+            Business b = new Business();
             while (jParser.nextToken() != JsonToken.END_OBJECT) {
                 String fieldname = jParser.getCurrentName();
-                //"^#" indicates that we have reached a new Business
-//                System.out.println(fieldname);
-                Map<String, Double> parsedTfidf = parseTfidf(jParser);
+                if (fieldname.equals("tfidf")) {
+                    b = new Business();
+                    b.settfidfmap(parseTfidf(jParser));
+                    businessdone = false;
+                } else if (fieldname.equals("business_name")) {
+                    ObjectCodec codec = jParser.getCodec();
+                    JsonNode node = codec.readTree(jParser);
+                    b.businessName = node.textValue();
+                } else if (fieldname.equals("business_address")) {
+                    ObjectCodec codec = jParser.getCodec();
+                    JsonNode node = codec.readTree(jParser);
+                    b.businessAddress = node.textValue();
+                    businessdone = true;
+                }
+                jParser.nextToken();
+                if (businessdone) {
+                    jParser.nextToken();
+                    System.out.println(b);
+                }
+
+
 
 
 //                if ("age".equals(fieldname)) {
@@ -61,21 +83,32 @@ public class ParseJSONFile {
             System.out.println("couldn't find file");
         }
     }
+    //at start, the token is "["
+    //at end the token is "]"
 
-    public Map<String, Double> parseTfidf(JsonParser jParser) throws IOException{
-//        CsvMapper csvMap = new CsvMapper();
-//        CsvSchema schema = CsvSchema.emptySchema().withHeader();
+    public TreeMap<String, Double> parseTfidf(JsonParser jParser) throws IOException{
+        TreeMap<String, Double> tfidfmap = new TreeMap<>();
         jParser.nextToken();
-        String keyWord = jParser.getText();
-        ObjectCodec codec = jParser.getCodec();
-        JsonNode node = codec.readTree(jParser);
-        Object tfidf = node.get(keyWord);
-        System.out.println(keyWord + ": " + tfidf) ;
         jParser.nextToken();
-        String keyWord2 = jParser.getText();
-        System.out.println(keyWord2);
+        boolean endArray = false;
+        while (!endArray) {
+            jParser.nextToken();
+            String keyWord = jParser.getText();
+            ObjectCodec codec = jParser.getCodec();
+            JsonNode node = codec.readTree(jParser);
+            DoubleNode tfidf1 = (DoubleNode) node.get(keyWord);
+            String tfidf2 = tfidf1.toString();
+            Double tfidf = Double.valueOf(tfidf2);
+            tfidfmap.put(keyWord, tfidf);
+//            System.out.println(keyWord + ": " + tfidf) ;
+            jParser.nextToken();
+            //check if reached end of array
+            if (jParser.getText().equals("]")) {
+                endArray = true;
+            }
 
-        return null;
+        }
+        return tfidfmap;
     }
 
 

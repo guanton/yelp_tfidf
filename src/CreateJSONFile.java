@@ -16,17 +16,18 @@ public class CreateJSONFile {
         JsonArray saves = new JsonArray();
         yp.secondPass(query);
         for (Business b : yp.businessSet) {
-            JsonObject business = new JsonObject();
+            OrderedJSONObject business = new OrderedJSONObject();
             //convert a business' tf-idf map to JSON
-            JsonObject tfidf = new JsonObject();
-            tfidf.putAll(b.tfidfmap);
+            JsonArray tfidf = new JsonArray();
+            for (String s: b.tfidfmap.keySet()) {
+                OrderedJSONObject bt = new OrderedJSONObject();
+                bt.put(s, b.tfidfmap.get(s));
+                tfidf.add(bt);
+            }
             business.put("tfidf", tfidf);
             //convert name and address to JSON
-            JSONObject bn = new JSONObject();
             business.put("business_name", b.businessName);
-            JSONObject ba = new JSONObject();
             business.put("business_address", b.businessAddress);
-            //preface each Business Object with its business ID
             saves.add(business);
         }
         try(FileWriter file = new FileWriter("myJSON.json")) {

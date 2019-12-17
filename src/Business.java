@@ -28,6 +28,10 @@ public class Business {
         this.tfidfmap = idfmap;
     }
 
+    public Business(){
+
+    }
+
     //other constructor for json
     public Business(String businessName, String businessAddress,
                     TreeMap<String, Double> idfmap) {
@@ -47,19 +51,19 @@ public class Business {
         return tfMap;
     }
 
-    //converts the map of words with their tfidf scores to a string
-    public String maptostring(Map<String, Double> tfidfmap) {
-        String s = "";
-        int x = 1;
-        for (Map.Entry<String,Double> entry : tfidfmap.entrySet()) {
-            s = s + "(" + entry.getKey() + ", " + entry.getValue() + "), ";
-            if (x % 6 == 0) {
-                s=s+"\n";
-            }
-            x++;
-        }
-        return s;
-    }
+//    //converts the map of words with their tfidf scores to a string
+//    public String maptostring(Map<String, Double> tfidfmap) {
+//        String s = "";
+//        int x = 1;
+//        for (Map.Entry<String,Double> entry : tfidfmap.entrySet()) {
+//            s = s + "(" + entry.getKey() + ", " + entry.getValue() + "), ";
+//            if (x % 6 == 0) {
+//                s=s+"\n";
+//            }
+//            x++;
+//        }
+//        return s;
+//    }
 
     public void settfidfmap(TreeMap<String, Double> tfidfmap) {
         this.tfidfmap = tfidfmap;
@@ -90,8 +94,7 @@ public class Business {
                 + "Business ID: " + businessID + "\n"
                 + "Business Name: " + businessName + "\n"
                 + "Business Address: " + businessAddress + "\n"
-                + "Character Count: " + reviewCharCount + "\n"
-                + "Key Words: " + maptostring(tfidfmap);
+                + "Key Words: " + tfidfmap;
     }
 
 

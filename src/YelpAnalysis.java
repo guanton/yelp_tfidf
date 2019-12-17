@@ -27,7 +27,7 @@ public class YelpAnalysis {
     private boolean freqmode;
     Set<Business> businessSet = new HashSet<>();
 
-    //search
+
 
 
     public void init(boolean mode){
