@@ -42,7 +42,7 @@ public class YelpAnalysis {
     public void secondPass(String query) {
         for (Business b: businessSet) {
             b.settfidfmap(tfidfcalculator(b));
-            b.assignTfidf();
+            b.assignTfidf(query);
 //            businesses.offer(b);
         }
     }

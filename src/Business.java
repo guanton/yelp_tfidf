@@ -28,7 +28,7 @@ public class Business {
         this.tfidfmap = idfmap;
     }
 
-    public Business(){
+    public Business() {
 
     }
 
@@ -43,27 +43,32 @@ public class Business {
     public void setFreqratio(Map<String, Double> d) {
         freqratio = d;
     }
-    public void setNumWords(int n) {numwords = n;}
+
+    public void setNumWords(int n) {
+        numwords = n;
+    }
+
     public void setTfMap(Map<String, Integer> tfMap) {
         this.tfMap = tfMap;
     }
+
     public Map<String, Integer> getTfMap() {
         return tfMap;
     }
 
-//    //converts the map of words with their tfidf scores to a string
-//    public String maptostring(Map<String, Double> tfidfmap) {
-//        String s = "";
-//        int x = 1;
-//        for (Map.Entry<String,Double> entry : tfidfmap.entrySet()) {
-//            s = s + "(" + entry.getKey() + ", " + entry.getValue() + "), ";
-//            if (x % 6 == 0) {
-//                s=s+"\n";
-//            }
-//            x++;
-//        }
-//        return s;
-//    }
+    //converts the map of words with their tfidf scores to a string
+    public String maptostring(Map<String, Double> tfidfmap) {
+        String s = "";
+        int x = 1;
+        for (Map.Entry<String, Double> entry : tfidfmap.entrySet()) {
+            s = s + "(" + entry.getKey() + ", " + entry.getValue() + "), ";
+            if (x % 6 == 0) {
+                s = s + "\n";
+            }
+            x++;
+        }
+        return s;
+    }
 
     public void settfidfmap(TreeMap<String, Double> tfidfmap) {
         this.tfidfmap = tfidfmap;
@@ -71,8 +76,8 @@ public class Business {
 
     public void assignFr(String query) {
         List<String> keyWords = Arrays.asList(query.split(" "));
-        for (String s: freqratio.keySet()) {
-            for (String keyWord: keyWords) {
+        for (String s : freqratio.keySet()) {
+            for (String keyWord : keyWords) {
                 if (s.equals(keyWord)) {
                     fr = fr + freqratio.get(keyWord);
                 }
@@ -80,10 +85,13 @@ public class Business {
         }
     }
 
-    public void assignTfidf() {
+    public void assignTfidf(String query) {
         double sumTfidf = 0;
-        for (String s: tfidfmap.keySet()) {
-            sumTfidf = sumTfidf + tfidfmap.get(s);
+        List<String> keyWords = Arrays.asList(query.split(" "));
+        for (String keyword : keyWords) {
+            if (tfidfmap.keySet().contains(keyword)) {
+                sumTfidf = sumTfidf + tfidfmap.get(keyword);
+            }
         }
         tfidf = sumTfidf;
     }
@@ -91,12 +99,11 @@ public class Business {
 
     public String toString() {
         return "-------------------------------------------------------------------------------\n"
-                + "Business ID: " + businessID + "\n"
+//                + "Business ID: " + businessID + "\n"
                 + "Business Name: " + businessName + "\n"
                 + "Business Address: " + businessAddress + "\n"
-                + "Key Words: " + tfidfmap;
+                + "Key Words: " + maptostring(tfidfmap);
     }
-
 
 
 }

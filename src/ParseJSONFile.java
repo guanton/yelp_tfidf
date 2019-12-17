@@ -9,26 +9,34 @@ import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.MinMaxPriorityQueue;
+import org.apache.wink.json4j.internal.Null;
 
 import javax.xml.soap.Node;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class ParseJSONFile {
 
+    Set<Business> businessSet = new HashSet<>();
     SortByTfidf stfidf = new SortByTfidf();
     MinMaxPriorityQueue<Business> businesses = MinMaxPriorityQueue.orderedBy(stfidf.reversed()).maximumSize(10).create();
 
     public static void main(String[] args) {
         ParseJSONFile pjf = new ParseJSONFile();
-        pjf.parseJson("");
+        pjf.parseJson();
+        pjf.search("pizza");
+        for (Business b: pjf.businesses) {
+            System.out.println(b);
+        }
     }
 
 
     //searches json file for businesses that contain the relevant keywords
-    public void parseJson(String query){
+    public void parseJson(){
         try {
             //create parser
             JsonFactory jf = new JsonFactory();
@@ -58,34 +66,28 @@ public class ParseJSONFile {
                 }
                 jParser.nextToken();
                 if (businessdone) {
+                    businessSet.add(b);
                     jParser.nextToken();
-                    System.out.println(b);
                 }
-
-
-
-
-//                if ("age".equals(fieldname)) {
-//                    jParser.nextToken();
-//                    parsedAge = jParser.getIntValue();
-//                }
-//
-//                if ("address".equals(fieldname)) {
-//                    jParser.nextToken();
-//                    while (jParser.nextToken() != JsonToken.END_ARRAY) {
-//                        addresses.add(jParser.getText());
-//                    }
-//                }
             }
-
         } catch (IOException e) {
-
             System.out.println("couldn't find file");
+        } catch (NullPointerException e) {
+            //parsing is done, will look into better fix later
         }
     }
+
+
+    public void search(String query) {
+        for (Business b: businessSet) {
+            b.assignTfidf(query);
+            businesses.offer(b);
+        }
+    }
+
+
     //at start, the token is "["
     //at end the token is "]"
-
     public TreeMap<String, Double> parseTfidf(JsonParser jParser) throws IOException{
         TreeMap<String, Double> tfidfmap = new TreeMap<>();
         jParser.nextToken();
