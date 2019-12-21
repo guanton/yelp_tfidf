@@ -76,7 +76,9 @@ public class ParseJSONFile {
     public void search(String query) {
         for (Business b: businessSet) {
             b.assignTfidf(query);
-            businesses.offer(b);
+            if (b.tfidf > 0) {
+                businesses.offer(b);
+            }
         }
     }
 

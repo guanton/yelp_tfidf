@@ -36,7 +36,7 @@ public class SearchEngine {
     }
 
     public void searchOperation() {
-        double time1 = System.currentTimeMillis();
+//        double time1 = System.currentTimeMillis();
         pjf = new ParseJSONFile();
         query = textField.getText();
         pjf.parseJson();
@@ -46,9 +46,12 @@ public class SearchEngine {
             pjf.search(query);
 //            double time3 = System.currentTimeMillis();
 //            System.out.println(time3-time2);
+            if (pjf.getBusinesses().size() == 0) {
+                noResult = true;
+                JOptionPane.showMessageDialog(f, "No businesses found with the keywords: " + "\"" + query + "\"");
+            }
         } catch (NullPointerException err) {
-            noResult = true;
-            JOptionPane.showMessageDialog(f, "No businesses found with the keywords: " + "\"" + query + "\"");
+
         }
         sp = new searchPanel(pjf.getBusinesses());
         if (!noResult) {
